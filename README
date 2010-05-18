@@ -7,7 +7,7 @@ A DSpace XSLT crosswalk to use with LNI protocol
 This file was originally authored by William Reilly at MIT.
 
 It has been tweaked for University of Helsinki's DSpace/Pure4 integration.
-
 Changes made for UH can be found by searching "tiaalto" from comment parts. Parts that are UH specific should have been commented as being such.
 
-
+bg@atira.dk 2010-05-18
+Tweaked to transfer more mods metadata, UH specific changes have been commented out.
