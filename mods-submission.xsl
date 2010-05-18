@@ -5,11 +5,6 @@
                 xmlns:mods="http://www.loc.gov/mods/v3"
                 version="1.0">
 
-
-
-        
-        
-
 <!--
                 **************************************************
                 MODS-2-DIM  ("DSpace Intermediate Metadata" ~ Dublin Core variant)
@@ -17,17 +12,12 @@
                 Original author William Reilly wreilly@mit.edu
                 Further developed by Timo Aalto (timo.j.aalto@helsinki.fi) 
                 for University of Helsinki Pure4 CRIS integration.
-
-
-     **************************************************
+				**************************************************
 -->
-
 
 <!--        See also mods.properties in same directory.
         e.g. dc.contributor = <mods:name><mods:namePart>%s</mods:namePart></mods:name> | mods:namePart/text()
 -->
-
-
                 
         <!-- Target XML:
                 http://wiki.dspace.org/DspaceIntermediateMetadata
@@ -37,7 +27,6 @@
                 <dim:field mdschema="dc" element="contributor" qualifier="author" lang="en">Brenner, Neil</dim:field>
                 ...
         -->
-
 
         <!-- Dublin Core schema links:
                         http://dublincore.org/schemas/xmls/qdc/2003/04/02/qualifieddc.xsd
@@ -100,33 +89,30 @@
                         <xsl:apply-templates/>
                 </xsl:element>
         </xsl:template>
+        
 <!--NOTE: at its current form, this XSL assumes that all output has an attribute "lang=en". 
 This should either be further developed to be language-sensitive or just change the lang code accordingly / tiaalto 12.5.2010-->
 <!-- **** MODS   titleInfo/title ====> DC title **** -->
-        <xsl:template match="*[local-name()='titleInfo']/*[local-name()='title']">
-                <xsl:element name="dim:field">
-                        <xsl:attribute name="mdschema">dc</xsl:attribute>
-                        <xsl:attribute name="element">title</xsl:attribute>
-                        <xsl:attribute name="lang">en</xsl:attribute>
-                        <xsl:value-of select="normalize-space(.)"/>
-                </xsl:element>
-        </xsl:template>
-
-
 <!-- **** MODS   titleInfo/subTitle ====> DC title ______ (?) **** -->
-        <!-- TODO No indication re: 'subTitle' from this page:
-                http://cwspace.mit.edu/docs/WorkActivity/Metadata/Crosswalks/MODSmapping2MB.html
-                -->
-        <!-- (Not anticipated from CSAIL.) -->
-
-        <xsl:template match="*[local-name()='titleInfo']/*[local-name()='subTitle']">
-                <xsl:element name="dim:field">
-                        <xsl:attribute name="mdschema">dc</xsl:attribute>
-                        <xsl:attribute name="element">title</xsl:attribute>
-                        <xsl:attribute name="qualifier">alternative</xsl:attribute>
-                        <xsl:attribute name="lang">en</xsl:attribute>
-                        <xsl:value-of select="normalize-space(.)"/>
-                </xsl:element>
+        <xsl:template match="*[local-name()='titleInfo']">
+            <xsl:choose>
+		        <xsl:when test="*[local-name()='title'] and *[local-name()='subTitle']">
+	                <xsl:element name="dim:field">
+	                        <xsl:attribute name="mdschema">dc</xsl:attribute>
+	                        <xsl:attribute name="element">title</xsl:attribute>
+	                        <xsl:attribute name="lang">en</xsl:attribute>
+	                        <xsl:value-of select="normalize-space(*[local-name()='title'])"/> : <xsl:value-of select="normalize-space(*[local-name()='subTitle'])"/> 
+	                </xsl:element>
+		        </xsl:when>
+		        <xsl:when test="*[local-name()='title']">
+	                <xsl:element name="dim:field">
+	                        <xsl:attribute name="mdschema">dc</xsl:attribute>
+	                        <xsl:attribute name="element">title</xsl:attribute>
+	                        <xsl:attribute name="lang">en</xsl:attribute>
+	                        <xsl:value-of select="normalize-space(*[local-name()='title'])"/> 
+	                </xsl:element>
+		        </xsl:when>
+			</xsl:choose>
         </xsl:template>
 
 
@@ -159,48 +145,38 @@ This should either be further developed to be language-sensitive or just change 
                                 a more controlled vocabulary via xsl:choose etc.)
                                 -->
                         <xsl:attribute name="qualifier"><xsl:value-of select="*[local-name()='role']/*[local-name()='roleTerm']"/></xsl:attribute>
-<!-- This would be the right way to parse author names, 
-        now commented out since it does not match the current source encoding / tiaalto 12.5.2010
-
                         <xsl:value-of select="*[local-name()='namePart'][@type='family']"/><xsl:text>, </xsl:text><xsl:value-of select="*[local-name()='namePart'][@type='given']"/>
--->
-                       <!-- This is a temporary solution, works only with the simplest surname, firstname case, (IOW, not well at all)-->
-                        <xsl:value-of select="substring-after(*[local-name()='namePart'], ' ')"/>
-                        <xsl:text>, </xsl:text><xsl:value-of select="substring-before(*[local-name()='namePart'], ' ')"/>
                 </xsl:element>
-                <!--         **** MODS affiliation ====> DC  creator.corporateName (UH specific, adjust accordingly) tiaalto 120210**** -->
                 <!--if there is an affiliation for a person-->
                 <xsl:if test="*[local-name()='affiliation']">
-                <xsl:element name="dim:field">
-                        <xsl:attribute name="mdschema">dc</xsl:attribute>
-                        <xsl:attribute name="element">creator</xsl:attribute>
-                        <xsl:attribute name="qualifier">corporateName</xsl:attribute>
-                        <xsl:attribute name="lang">en</xsl:attribute>
-                        <xsl:value-of select="*[local-name()='affiliation']"/>               
-                </xsl:element>
+	                <xsl:element name="dim:field">
+	                        <xsl:attribute name="mdschema">dc</xsl:attribute>
+                <!--         **** MODS affiliation ====> DC  creator.corporateName (UH specific, adjust accordingly) tiaalto 120210**** -->
+	                        <!-- xsl:attribute name="element">creator</xsl:attribute>
+	                        <xsl:attribute name="qualifier">corporateName</xsl:attribute-->
+	                        
+	                        <xsl:attribute name="element">contributor</xsl:attribute>
+	                        <xsl:attribute name="qualifier">institution</xsl:attribute>
+	                        <xsl:attribute name="lang">en</xsl:attribute>
+	                        <xsl:value-of select="*[local-name()='affiliation']"/>               
+	                </xsl:element>
                 </xsl:if>
                 
                 <!--This is for capturing local authors (ie Pure persons?) into their own DIM field, for integration purposes.
                 It assumes that such persons have been encoded in MODS using a authority="local" attribute in v3:name / tiaalto 12.5.2010-->
                 
-                <xsl:if test="@authority='local'">
+                <!--this DIM mapping is just for testing and must be changed-->
+                <!-- xsl:if test="@authority='local'">
                         <xsl:element name="dim:field">
-                                <!--this DIM mapping is just for testing and must be changed-->
                                 <xsl:attribute name="mdschema">dc</xsl:attribute>
                                 <xsl:attribute name="element">contributor</xsl:attribute>
                                 <xsl:attribute name="qualifier">other</xsl:attribute>
-                                <!-- This is a temporary solution, works only with the simplest surname, firstname case, (IOW, not well at all, see above)-->
-                                <xsl:value-of select="substring-after(*[local-name()='namePart'], ' ')"/>
-                                <xsl:text>, </xsl:text><xsl:value-of select="substring-before(*[local-name()='namePart'], ' ')"/>
+                        		<xsl:value-of select="*[local-name()='namePart'][@type='family']"/><xsl:text>, </xsl:text><xsl:value-of select="*[local-name()='namePart'][@type='given']"/>
                         </xsl:element>              
-                      
-                </xsl:if>
+                </xsl:if-->
         </xsl:template>
         
-        
-
-
-        <!-- **** MODS   originInfo/dateValid ====> DC  date.embargoedUntil (UH specific, adjust accordingly) tiaalto 120210 **** -->
+<!-- **** MODS   originInfo/dateValid ====> DC  date.embargoedUntil (UH specific, adjust accordingly) tiaalto 120210 **** -->
         <xsl:template match="*[local-name()='originInfo']/*[local-name()='dateValid']">
                 <xsl:element name="dim:field">
                         <xsl:attribute name="mdschema">dc</xsl:attribute>
@@ -222,7 +198,7 @@ This should either be further developed to be language-sensitive or just change 
                 </xsl:element>
         </xsl:template>
         
-        <!-- **** MODS   Language/LanguageTerm ====> DC  language.iso **** -->
+<!-- **** MODS   Language/LanguageTerm ====> DC  language.iso **** -->
         <xsl:template match="*[local-name()='language']/*[local-name()='languageTerm']">
                 <xsl:element name="dim:field">
                         <xsl:attribute name="mdschema">dc</xsl:attribute>
@@ -341,18 +317,20 @@ http://cwspace.mit.edu/docs/WorkActivity/Metadata/Crosswalks/MODSmapping2MB.html
                         </xsl:otherwise>
                 </xsl:choose>
              
-                       <xsl:element name="dim:field">
-                        <xsl:attribute name="mdschema">dc</xsl:attribute>
-                        <xsl:attribute name="element">identifier</xsl:attribute>
-                        <xsl:attribute name="qualifier">
-                                <xsl:choose>       
-                                        <xsl:when test="*[local-name()='identifier'][@type='issn']">issn</xsl:when>
-                                        <xsl:when test="*[local-name()='identifier'][@type='isbn']">isbn</xsl:when>
-                                        <xsl:otherwise>other</xsl:otherwise>
-                                </xsl:choose>
-                        </xsl:attribute>
-                        <xsl:value-of select="normalize-space(*[local-name()='identifier'])"/>               
-                </xsl:element>
+                <xsl:if test="count(*[local-name()='identifier']) &gt; 0">
+	                <xsl:element name="dim:field">
+	                        <xsl:attribute name="mdschema">dc</xsl:attribute>
+	                        <xsl:attribute name="element">identifier</xsl:attribute>
+	                        <xsl:attribute name="qualifier">
+	                                <xsl:choose>       
+	                                        <xsl:when test="*[local-name()='identifier'][@type='issn']">issn</xsl:when>
+	                                        <xsl:when test="*[local-name()='identifier'][@type='isbn']">isbn</xsl:when>
+	                                        <xsl:otherwise>other</xsl:otherwise>
+	                                </xsl:choose>
+	                        </xsl:attribute>
+	                        <xsl:value-of select="normalize-space(*[local-name()='identifier'])"/>               
+	                </xsl:element>
+	           </xsl:if>
         </xsl:template>
         
 
@@ -407,6 +385,70 @@ http://cwspace.mit.edu/docs/WorkActivity/Metadata/Crosswalks/MODSmapping2MB.html
                         <xsl:value-of select="normalize-space(.)"/>
                 </xsl:element>
         </xsl:template>
+
+<!-- bg@atira.dk 17.05.10 Added handling of genre for publication type and file type, added handling of note for document version -->
+
+<!-- **** MODS   genre  ====> DC  type  **** -->
+        <xsl:template match="*[local-name()='genre']">
+                <xsl:choose>
+                        <!-- 1)  DC  type  -->
+                        <xsl:when test="./@type='documentType'">
+                                <xsl:element name="dim:field">
+                                        <xsl:attribute name="mdschema">dc</xsl:attribute>
+                                        <xsl:attribute name="element">type</xsl:attribute>
+                                        <xsl:attribute name="lang">en</xsl:attribute>
+                        				<xsl:value-of select="normalize-space(.)"/>
+                                </xsl:element>
+                        </xsl:when>
+                        <!-- 2)  DC  type (publication type)  -->
+                        <xsl:when test="./@type='publicationType'">
+                                <xsl:element name="dim:field">
+                                        <xsl:attribute name="mdschema">dc</xsl:attribute>
+                                        <xsl:attribute name="element">type</xsl:attribute> <!-- TODO: Move to other dc field? -->
+                                        <xsl:attribute name="lang">en</xsl:attribute>
+                        				<xsl:value-of select="normalize-space(.)"/>
+                                </xsl:element>
+                        </xsl:when>
+                </xsl:choose>
+        </xsl:template>
+
+<!-- **** MODS   note[@type=version identification]  ====> DC  description.version  **** -->
+<!-- **** MODS   note  ====> DC  description  **** -->
+        <xsl:template match="*[local-name()='note']">
+                <xsl:choose>
+                        <xsl:when test="./@type='version identification'">
+			                <xsl:element name="dim:field">
+			                        <xsl:attribute name="mdschema">dc</xsl:attribute>
+			                        <xsl:attribute name="element">description</xsl:attribute>
+									<xsl:attribute name="qualifier">version</xsl:attribute>
+			                        <xsl:attribute name="lang">en</xsl:attribute>
+			                        <xsl:value-of select="normalize-space(.)"/>
+			                </xsl:element>
+                        </xsl:when>
+                        <xsl:otherwise>
+			                <xsl:element name="dim:field">
+			                        <xsl:attribute name="mdschema">dc</xsl:attribute>
+			                        <xsl:attribute name="element">description</xsl:attribute>
+			                        <xsl:attribute name="lang">en</xsl:attribute>
+			                        <xsl:value-of select="normalize-space(.)"/>
+			                </xsl:element>
+                        </xsl:otherwise>
+                </xsl:choose>
+        </xsl:template>
+        
+<!-- **** MODS   location/url  ====> DC  identifier.uri  **** -->
+        <xsl:template match="*[local-name()='location']/*[local-name()='url']">
+                <xsl:element name="dim:field">
+                        <xsl:attribute name="mdschema">dc</xsl:attribute>
+                        <xsl:attribute name="element">identifier</xsl:attribute>
+						<xsl:attribute name="qualifier">uri</xsl:attribute>
+                        <xsl:attribute name="lang">en</xsl:attribute>
+                        <xsl:value-of select="normalize-space(.)"/>
+                </xsl:element>
+        </xsl:template>
+        
+<!-- bg@atira.dk 17.05.10 end -->
+
         <!--tiaalto 12.05.10: This template is for massaging the embargo date into a form understandable by DSpace.
         source: http://geekswithblogs.net/workdog/archive/2007/02/08/105858.aspx-->
 
