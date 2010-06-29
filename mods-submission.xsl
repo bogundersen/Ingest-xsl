@@ -438,6 +438,15 @@ http://cwspace.mit.edu/docs/WorkActivity/Metadata/Crosswalks/MODSmapping2MB.html
 			                        <xsl:value-of select="normalize-space(.)"/>
 			                </xsl:element>
                         </xsl:when>
+                        <xsl:when test="./@type='peerreview status'">
+			                <xsl:element name="dim:field">
+			                        <xsl:attribute name="mdschema">dc</xsl:attribute>
+			                        <xsl:attribute name="element">description</xsl:attribute>
+									<xsl:attribute name="qualifier">status</xsl:attribute>
+			                        <xsl:attribute name="lang">en</xsl:attribute>
+			                        <xsl:value-of select="normalize-space(.)"/>
+			                </xsl:element>
+                        </xsl:when>
                         <xsl:otherwise>
 			                <xsl:element name="dim:field">
 			                        <xsl:attribute name="mdschema">dc</xsl:attribute>
