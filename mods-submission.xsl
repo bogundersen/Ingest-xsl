@@ -145,7 +145,21 @@ This should either be further developed to be language-sensitive or just change 
                                 a more controlled vocabulary via xsl:choose etc.)
                                 -->
                         <xsl:attribute name="qualifier"><xsl:value-of select="*[local-name()='role']/*[local-name()='roleTerm']"/></xsl:attribute>
-                        <xsl:value-of select="*[local-name()='namePart'][@type='family']"/><xsl:text>, </xsl:text><xsl:value-of select="*[local-name()='namePart'][@type='given']"/>
+                        
+						<xsl:choose>
+							<xsl:when test="*[local-name()='namePart'][@type='given'] and *[local-name()='namePart'][@type='family']">
+								<xsl:value-of select="*[local-name()='namePart'][@type='family']"/><xsl:text>, </xsl:text><xsl:value-of select="*[local-name()='namePart'][@type='given']"/>
+							</xsl:when>
+							<xsl:when test="*[local-name()='namePart'][@type='given']">
+								<xsl:value-of select="*[local-name()='namePart'][@type='given']"/>
+							</xsl:when>
+							<xsl:when test="*[local-name()='namePart'][@type='family']">
+								<xsl:value-of select="*[local-name()='namePart'][@type='family']"/>
+							</xsl:when>
+							<xsl:otherwise>
+								No name
+							</xsl:otherwise>
+						</xsl:choose>
                 </xsl:element>
                 <!--if there is an affiliation for a person-->
                 <xsl:if test="*[local-name()='affiliation']">
