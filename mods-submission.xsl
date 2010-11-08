@@ -133,8 +133,8 @@ This should either be further developed to be language-sensitive or just change 
 
 
 <!-- **** MODS  name ====> DC  contributor.{role/roleTerm} **** -->
-        <xsl:template match="*[local-name()='name']">
-                
+        <xsl:template match="*[local-name()='name'][@type='personal']">
+
                 <xsl:element name="dim:field">
                         <xsl:attribute name="mdschema">dc</xsl:attribute>
                         <xsl:attribute name="element">contributor</xsl:attribute>
@@ -161,35 +161,21 @@ This should either be further developed to be language-sensitive or just change 
 							</xsl:otherwise>
 						</xsl:choose>
                 </xsl:element>
-                <!--if there is an affiliation for a person-->
-                <xsl:if test="*[local-name()='affiliation']">
+        </xsl:template>
+        
+        <xsl:template match="*[local-name()='name'][@type='corporate']">
+                <xsl:if test="*[local-name()='namePart']">
 	                <xsl:element name="dim:field">
 	                        <xsl:attribute name="mdschema">dc</xsl:attribute>
-                <!--         **** MODS affiliation ====> DC  creator.corporateName (UH specific, adjust accordingly) tiaalto 120210**** -->
-	                        <!-- xsl:attribute name="element">creator</xsl:attribute>
-	                        <xsl:attribute name="qualifier">corporateName</xsl:attribute-->
 	                        
 	                        <xsl:attribute name="element">contributor</xsl:attribute>
 	                        <xsl:attribute name="qualifier">institution</xsl:attribute>
 	                        <xsl:attribute name="lang">en</xsl:attribute>
-	                        <xsl:value-of select="*[local-name()='affiliation']"/>               
+	                        <xsl:value-of select="*[local-name()='namePart']"/>               
 	                </xsl:element>
                 </xsl:if>
-                
-                <!--This is for capturing local authors (ie Pure persons?) into their own DIM field, for integration purposes.
-                It assumes that such persons have been encoded in MODS using a authority="local" attribute in v3:name / tiaalto 12.5.2010-->
-                
-                <!--this DIM mapping is just for testing and must be changed-->
-                <!-- xsl:if test="@authority='local'">
-                        <xsl:element name="dim:field">
-                                <xsl:attribute name="mdschema">dc</xsl:attribute>
-                                <xsl:attribute name="element">contributor</xsl:attribute>
-                                <xsl:attribute name="qualifier">other</xsl:attribute>
-                        		<xsl:value-of select="*[local-name()='namePart'][@type='family']"/><xsl:text>, </xsl:text><xsl:value-of select="*[local-name()='namePart'][@type='given']"/>
-                        </xsl:element>              
-                </xsl:if-->
         </xsl:template>
-        
+                
 <!-- **** MODS   originInfo/dateValid ====> DC  date.embargoedUntil (UH specific, adjust accordingly) tiaalto 120210 **** -->
         <xsl:template match="*[local-name()='originInfo']/*[local-name()='dateValid']">
                 <xsl:element name="dim:field">
