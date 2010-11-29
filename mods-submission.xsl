@@ -428,34 +428,40 @@ http://cwspace.mit.edu/docs/WorkActivity/Metadata/Crosswalks/MODSmapping2MB.html
 <!-- **** MODS   note[@type=version identification]  ====> DC  description.version  **** -->
 <!-- **** MODS   note  ====> DC  description  **** -->
         <xsl:template match="*[local-name()='note']">
-                <xsl:choose>
-                        <xsl:when test="./@type='version identification'">
-			                <xsl:element name="dim:field">
-			                        <xsl:attribute name="mdschema">dc</xsl:attribute>
-			                        <xsl:attribute name="element">description</xsl:attribute>
-									<xsl:attribute name="qualifier">version</xsl:attribute>
-			                        <xsl:attribute name="lang">en</xsl:attribute>
-			                        <xsl:value-of select="normalize-space(.)"/>
-			                </xsl:element>
+				<xsl:choose>
+						<!-- Note with @type -->
+                        <xsl:when test="./@type">
+							<xsl:choose>
+									<xsl:when test="./@type='version identification'">
+										<xsl:element name="dim:field">
+												<xsl:attribute name="mdschema">dc</xsl:attribute>
+												<xsl:attribute name="element">description</xsl:attribute>
+												<xsl:attribute name="qualifier">version</xsl:attribute>
+												<xsl:attribute name="lang">en</xsl:attribute>
+												<xsl:value-of select="normalize-space(.)"/>
+										</xsl:element>
+									</xsl:when>
+									<xsl:when test="./@type='peerreview status'">
+										<xsl:element name="dim:field">
+												<xsl:attribute name="mdschema">dc</xsl:attribute>
+												<xsl:attribute name="element">description</xsl:attribute>
+												<xsl:attribute name="qualifier">status</xsl:attribute>
+												<xsl:attribute name="lang">en</xsl:attribute>
+												<xsl:value-of select="normalize-space(.)"/>
+										</xsl:element>
+									</xsl:when>
+							</xsl:choose>
                         </xsl:when>
-                        <xsl:when test="./@type='peerreview status'">
-			                <xsl:element name="dim:field">
-			                        <xsl:attribute name="mdschema">dc</xsl:attribute>
-			                        <xsl:attribute name="element">description</xsl:attribute>
-									<xsl:attribute name="qualifier">status</xsl:attribute>
-			                        <xsl:attribute name="lang">en</xsl:attribute>
-			                        <xsl:value-of select="normalize-space(.)"/>
-			                </xsl:element>
-                        </xsl:when>
-                        <xsl:otherwise>
-			                <xsl:element name="dim:field">
-			                        <xsl:attribute name="mdschema">dc</xsl:attribute>
-			                        <xsl:attribute name="element">description</xsl:attribute>
-			                        <xsl:attribute name="lang">en</xsl:attribute>
-			                        <xsl:value-of select="normalize-space(.)"/>
-			                </xsl:element>
-                        </xsl:otherwise>
-                </xsl:choose>
+						<!-- Note without @type -->
+						<xsl:otherwise>
+							<xsl:element name="dim:field">
+									<xsl:attribute name="mdschema">dc</xsl:attribute>
+									<xsl:attribute name="element">description</xsl:attribute>
+									<xsl:attribute name="lang">en</xsl:attribute>
+									<xsl:value-of select="normalize-space(.)"/>
+							</xsl:element>
+						</xsl:otherwise>
+				</xsl:choose>
         </xsl:template>
         
 <!-- **** MODS   location/url  ====> DC  identifier.uri  **** -->
