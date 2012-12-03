@@ -359,36 +359,40 @@ http://cwspace.mit.edu/docs/WorkActivity/Metadata/Crosswalks/MODSmapping2MB.html
         
 
 <!-- **** MODS   identifier/@type  ====> DC identifier.other  **** -->
-       <xsl:template match="*[local-name()='identifier']"> <!-- [@type='series']"> -->
-                <xsl:element name="dim:field">
-                        <xsl:attribute name="mdschema">dc</xsl:attribute>
-                        <xsl:attribute name="element">identifier</xsl:attribute>
-                        <xsl:choose>
-                                <xsl:when test="./@type='local'">
-                                        <xsl:attribute name="qualifier">other</xsl:attribute>
-                                </xsl:when>
-                                <xsl:when test="./@type='doi'">
-                                        <xsl:attribute name="qualifier">doi</xsl:attribute>
-                                </xsl:when>
-                                <xsl:when test="./@type='uri'">
-                                        <xsl:attribute name="qualifier">uri</xsl:attribute>
-                                </xsl:when>
-                                <xsl:when test="./@type='isbn'">
-                                        <xsl:attribute name="qualifier">isbn</xsl:attribute>
-                                </xsl:when>
-                                <xsl:when test="./@type='issn'">
-                                        <xsl:attribute name="qualifier">issn</xsl:attribute>
-                                </xsl:when>
-                                <!-- 6 (?) more... TODO
-                                        http://cwspace.mit.edu/docs/WorkActivity/Metadata/Crosswalks/MODSmapping2MB.html
-                                        http://www.loc.gov/standards/mods/mods-outline.html#identifier
-                                        
-                                        (but see also MODS relatedItem[@type="host"]/part/text == identifier.citation)
-                                -->
-                        </xsl:choose>
-                        <xsl:value-of select="normalize-space(.)"/>
-                </xsl:element>
-                </xsl:template>
+		<xsl:template match="*[local-name()='identifier']"> <!-- [@type='series']"> -->
+			<xsl:choose>
+				<xsl:when test="./@type='uri' and substring(., 1, 21) = 'http://hdl.handle.net'">
+				<!-- Do nothing, should not include uri starting with http://hdl.handle.net to avoid duplicates in DSpace -->
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:element name="dim:field">
+						<xsl:attribute name="mdschema">dc</xsl:attribute>
+						<xsl:attribute name="element">identifier</xsl:attribute>
+						<xsl:choose>
+							<xsl:when test="./@type='local'">
+								<xsl:attribute name="qualifier">other</xsl:attribute>
+							</xsl:when>
+							<xsl:when test="./@type='doi'">
+								<xsl:attribute name="qualifier">doi</xsl:attribute>
+							</xsl:when>
+							<xsl:when test="./@type='uri'">
+								<xsl:attribute name="qualifier">uri</xsl:attribute>
+							</xsl:when>
+							<xsl:when test="./@type='isbn'">
+								<xsl:attribute name="qualifier">isbn</xsl:attribute>
+							</xsl:when>
+							<xsl:when test="./@type='issn'">
+								<xsl:attribute name="qualifier">issn</xsl:attribute>
+							</xsl:when>
+							<!-- 6 (?) more... TODO http://cwspace.mit.edu/docs/WorkActivity/Metadata/Crosswalks/MODSmapping2MB.html 
+								http://www.loc.gov/standards/mods/mods-outline.html#identifier (but see also 
+								MODS relatedItem[@type="host"]/part/text == identifier.citation) -->
+						</xsl:choose>
+						<xsl:value-of select="normalize-space(.)" />
+					</xsl:element>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:template>
 
 <!-- **** MODS   originInfo/publisher  ====> DC  publisher  **** -->
         <xsl:template match="*[local-name()='originInfo']/*[local-name()='publisher']">
@@ -464,15 +468,23 @@ http://cwspace.mit.edu/docs/WorkActivity/Metadata/Crosswalks/MODSmapping2MB.html
 				</xsl:choose>
         </xsl:template>
         
-<!-- **** MODS   location/url  ====> DC  identifier.uri  **** -->
+<!-- **** MODS   location/url  ====> DC  
+  **** -->
         <xsl:template match="*[local-name()='location']/*[local-name()='url']">
-                <xsl:element name="dim:field">
-                        <xsl:attribute name="mdschema">dc</xsl:attribute>
-                        <xsl:attribute name="element">identifier</xsl:attribute>
-						<xsl:attribute name="qualifier">uri</xsl:attribute>
-                        <xsl:attribute name="lang">en</xsl:attribute>
-                        <xsl:value-of select="normalize-space(.)"/>
-                </xsl:element>
+        	<xsl:choose>
+				<xsl:when test="substring(., 1, 21) = 'http://hdl.handle.net'">
+				<!-- Do nothing, should not include uri starting with http://hdl.handle.net to avoid duplicates in DSpace -->
+				</xsl:when>
+				<xsl:otherwise>
+	                <xsl:element name="dim:field">
+	                        <xsl:attribute name="mdschema">dc</xsl:attribute>
+	                        <xsl:attribute name="element">identifier</xsl:attribute>
+							<xsl:attribute name="qualifier">uri</xsl:attribute>
+	                        <xsl:attribute name="lang">en</xsl:attribute>
+	                        <xsl:value-of select="normalize-space(.)"/>
+	                </xsl:element>
+                </xsl:otherwise>
+        	</xsl:choose>
         </xsl:template>
         
 <!-- bg@atira.dk 17.05.10 end -->
